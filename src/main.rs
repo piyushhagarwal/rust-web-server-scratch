@@ -76,6 +76,21 @@ fn handle_client(mut stream: TcpStream) {
     }
 
     println!("Body: {:#?}", body);
+
+    // Extract the first line of the request
+    let request_first_line = &headers[0];
+
+    // Extract the request method and path
+    let mut parts = request_first_line.split_whitespace();
+
+    // Extract the request method
+    let method = parts.next().unwrap();
+
+    // Extract the request path
+    let path = parts.next().unwrap();
+
+    println!("Method: {}", method);
+    println!("Path: {}", path);
     
     // Send a basic response
     let response = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
