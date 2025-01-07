@@ -6,16 +6,21 @@ use std::{
 // Server address and port configuration
 const SERVER_ADDR: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 1); // Localhost IP address
 const SERVER_PORT: u16 = 8080; // Port number
-const SOCKET_ADDR: SocketAddrV4 = SocketAddrV4::new(SERVER_ADDR, SERVER_PORT);
+const SOCKET_ADDR: SocketAddrV4 = SocketAddrV4::new(SERVER_ADDR, SERVER_PORT); // Socket address¯
 
 fn main() {
     println!("Hello from Server!");
+
+    // Create a TCP listener bound to the socket address
     let listener = TcpListener::bind(SOCKET_ADDR).unwrap();
 
+    // Listen for incoming TCP connections
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
                 println!("New connection: {}", stream.peer_addr().unwrap());
+
+                // Handle the client
                 handle_client(stream);
             }
             Err(err) => {
