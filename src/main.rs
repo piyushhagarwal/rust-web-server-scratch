@@ -1,5 +1,5 @@
 use std::{
-    io::{self, BufRead, BufReader, Read, Write},
+    io::{ BufRead, BufReader, Read, Write},
     net::{Ipv4Addr, SocketAddrV4, TcpListener, TcpStream},
 };
 
@@ -29,6 +29,7 @@ fn handle_client(mut stream: TcpStream) {
     let mut buf_reader = BufReader::new(&stream);
     let mut headers = Vec::new();
     let mut content_length = None;
+    let mut body = String::new();
     
     // Read headers
     loop {
@@ -53,16 +54,23 @@ fn handle_client(mut stream: TcpStream) {
     
     println!("Headers: {:#?}", headers);
     
-    // Read body if Content-Length is present
+    // If the content length is present, read the body. The body is the remaining data in the stream. 
+    // We first make a vector of bytes of the length of the content length, then read the body into the vector. 
+    // Finally, we convert the vector to a string.
+
     if let Some(length) = content_length {
-        let mut body = vec![0u8; length];
-        buf_reader.read_exact(&mut body).unwrap();
+        let mut body_vec = vec![0u8; length];
+        buf_reader.read_exact(&mut body_vec).unwrap();
         
-        match String::from_utf8(body) {
-            Ok(body_str) => println!("Body: {}", body_str),
+        match String::from_utf8(body_vec) {
+            Ok(body_str) => {
+                body = body_str;
+            }
             Err(_) => println!("Body contains non-UTF8 data"),
         }
     }
+
+    println!("Body: {:#?}", body);
     
     // Send a basic response
     let response = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
